@@ -1,79 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Decision Roulette
+
+Decision Roulette helps users break decision fatigue by randomly selecting one action from up to five options. Each spin gives a clear next step, so teams can move quickly without overthinking.
+
+## Features
+
+- Five-slot roulette: enter up to five candidate actions per spin.
+- Action history: review previous picks and re-spin when needed.
+- Supabase authentication: email sign up/in/out with automatic profile creation.
+- Guardrails: login attempts with unknown emails display “Access Denied, sign up to log in.”
+- Responsive UI: built with the Next.js App Router and Tailwind for a mobile-friendly experience.
+
+## Tech Stack
+
+- Next.js 14 App Router
+- React + TypeScript
+- Tailwind CSS
+- Supabase (auth + database)
+- PNPM/NPM scripts
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ installed
-- A Supabase account ([sign up here](https://app.supabase.com))
+- Node.js 18+
+- PNPM or NPM
+- Supabase account
 
-### Setup Steps
+### Setup
 
-1. **Install Dependencies**
+1. **Install dependencies**
    ```bash
    npm install
    ```
+   or
+   ```bash
+   pnpm install
+   ```
 
-2. **Set Up Supabase**
-   - Create a new project at [https://app.supabase.com](https://app.supabase.com)
-   - Run the database migration:
-     - Go to SQL Editor in your Supabase dashboard
-     - Copy and paste the contents of `supabase/migrations/001_create_profiles_table.sql`
-     - Execute the migration
-   - Get your API credentials:
-     - Go to Settings > API in your Supabase dashboard
-     - Copy your Project URL and Anon Key
+2. **Provision Supabase**
+   - Create a new project at [Supabase](https://app.supabase.com).
+   - Run the SQL from `supabase/migrations/001_create_profiles_table.sql`.
+   - Copy your Project URL and Anon Key from Settings → API.
 
-3. **Configure Environment Variables**
-   - Copy `.env.example` to `.env.local`:
-     ```bash
-     cp .env.example .env.local
-     ```
-   - Update `.env.local` with your Supabase credentials:
-     ```
-     NEXT_PUBLIC_SUPABASE_URL=your_project_url_here
-     NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
-     ```
+3. **Environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+   Update the file:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=<your_project_url>
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<your_anon_key>
+   ```
 
-4. **Run the Development Server**
+4. **Run the dev server**
    ```bash
    npm run dev
    ```
+   Visit [http://localhost:3000](http://localhost:3000) to try the roulette.
 
-   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Usage
 
-## Features
-
-- Email-based authentication (sign up, sign in, sign out)
-- Automatic profile creation on signup
-- Protected routes with middleware
-- Responsive design with Tailwind CSS
+1. Sign up or log in.
+2. Enter up to five actions you are considering.
+3. Spin the wheel and follow the result.
+4. If you need another option, adjust the list and spin again.
 
 ## Project Structure
 
-- `app/` - Next.js App Router pages and components
-  - `actions/` - Server actions for authentication
-  - `signin/` - Sign in page
-  - `signup/` - Sign up page
-  - `components/` - Reusable components
-- `lib/supabase/` - Supabase client utilities
-- `supabase/migrations/` - Database migration files
-- `middleware.ts` - Next.js middleware for auth state management
+- `app/` — routed pages, roulette UI, auth flows.
+  - `actions/` — server actions for Supabase auth.
+  - `signin/`, `signup/` — entry points for auth.
+  - `components/` — reusable UI (wheel, forms, history).
+- `lib/supabase/` — Supabase client helpers.
+- `middleware.ts` — auth-aware routing protection.
+- `supabase/` — SQL migrations and documentation.
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Supabase Documentation](https://supabase.com/docs) - learn about Supabase features.
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-**Important:** Don't forget to add your environment variables in Vercel's project settings:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deploy on [Vercel](https://vercel.com) or any Next.js-compatible platform. Remember to add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to the platform environment settings.
