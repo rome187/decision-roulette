@@ -1,0 +1,1 @@
+add drizzle commands that we can manage the migrations.

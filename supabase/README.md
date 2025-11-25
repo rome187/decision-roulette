@@ -31,7 +31,8 @@ This project uses Drizzle ORM for database schema management. Database schemas a
 4. **Run Migrations**
    - Migrations are located in `drizzle/migrations/`
    - To apply migrations, you can either:
-     - Use `drizzle-kit push` to push schema changes directly (development)
+     - Use `npm run db:push` to push schema changes directly (development)
+     - Use `npm run db:migrate` to apply migrations (production)
      - Or manually run the SQL files from `drizzle/migrations/` in Supabase SQL Editor (production)
 
 ## Database Schema
@@ -43,12 +44,23 @@ The database schema is defined in `lib/db/schema.ts` using Drizzle ORM. The curr
 - Trigger functions for automatic profile creation and timestamp updates
 - Username validation constraints
 
-## Generating Migrations
+## Migration Management
+
+This project includes npm scripts for managing database migrations:
+
+- `npm run db:generate` - Generate migration files from schema changes in `lib/db/schema.ts`
+- `npm run db:push` - Push schema changes directly to database (development only)
+- `npm run db:migrate` - Apply migrations to database
+- `npm run db:studio` - Open Drizzle Studio for database inspection
+- `npm run db:check` - Check migration status
+- `npm run db:drop` - Drop migrations (useful for resetting)
+
+### Generating Migrations
 
 When you modify the schema in `lib/db/schema.ts`, generate a new migration:
 
 ```bash
-npx drizzle-kit generate
+npm run db:generate
 ```
 
 This will create a new migration file in `drizzle/migrations/` that you can review and apply.
