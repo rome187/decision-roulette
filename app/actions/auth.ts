@@ -6,11 +6,14 @@ import { createServerComponentClient } from '@/lib/supabase/server'
 
 export type AuthResult = {
   success: boolean
+  codeSent?: boolean
+  email?: string
   error?: string
   fieldErrors?: {
     email?: string
     password?: string
     confirmPassword?: string
+    code?: string
   }
 }
 
@@ -60,6 +63,15 @@ function mapSupabaseError(error: { message: string; status?: number }): string {
   if (message.includes('rate limit')) {
     return 'Too many attempts. Please wait a moment and try again.'
   }
+  if (message.includes('invalid otp') || message.includes('invalid code') || message.includes('token')) {
+    return 'Invalid verification code. Please check the code and try again.'
+  }
+  if (message.includes('expired') || message.includes('expire')) {
+    return 'Verification code has expired. Please request a new code.'
+  }
+  if (message.includes('otp') || message.includes('verification')) {
+    return 'Verification failed. Please try again.'
+  }
   
   return error.message || 'An unexpected error occurred. Please try again.'
 }
@@ -71,8 +83,6 @@ export async function signUp(
   const supabase = await createServerComponentClient()
 
   const email = formData.get('email') as string
-  const password = formData.get('password') as string
-  const confirmPassword = formData.get('confirmPassword') as string
 
   const fieldErrors: AuthResult['fieldErrors'] = {}
 
@@ -80,19 +90,6 @@ export async function signUp(
   const emailError = validateEmail(email)
   if (emailError) {
     fieldErrors.email = emailError
-  }
-
-  // Validate password
-  const passwordError = validatePassword(password, true)
-  if (passwordError) {
-    fieldErrors.password = passwordError
-  }
-
-  // Validate confirm password
-  if (!confirmPassword) {
-    fieldErrors.confirmPassword = 'Please confirm your password'
-  } else if (password !== confirmPassword) {
-    fieldErrors.confirmPassword = 'Passwords do not match'
   }
 
   // Return early if there are validation errors
@@ -103,17 +100,72 @@ export async function signUp(
     }
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signInWithOtp({
     email: email.trim(),
-    password: password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+      shouldCreateUser: true,
     },
   })
 
   if (error) {
     return {
       success: false,
+      error: mapSupabaseError(error),
+    }
+  }
+
+  return {
+    success: true,
+    codeSent: true,
+    email: email.trim(),
+  }
+}
+
+export async function verifyOtpCode(
+  prevState: AuthResult | null,
+  formData: FormData
+): Promise<AuthResult> {
+  const supabase = await createServerComponentClient()
+
+  const email = formData.get('email') as string
+  const code = formData.get('code') as string
+
+  const fieldErrors: AuthResult['fieldErrors'] = {}
+
+  // Validate email
+  const emailError = validateEmail(email)
+  if (emailError) {
+    fieldErrors.email = emailError
+  }
+
+  // Validate code
+  if (!code) {
+    fieldErrors.code = 'Verification code is required'
+  } else if (!/^\d{6}$/.test(code.trim())) {
+    fieldErrors.code = 'Verification code must be 6 digits'
+  }
+
+  // Return early if there are validation errors
+  if (Object.keys(fieldErrors).length > 0) {
+    return {
+      success: false,
+      codeSent: true,
+      email: email,
+      fieldErrors,
+    }
+  }
+
+  const { error } = await supabase.auth.verifyOtp({
+    email: email.trim(),
+    token: code.trim(),
+    type: 'email',
+  })
+
+  if (error) {
+    return {
+      success: false,
+      codeSent: true,
+      email: email.trim(),
       error: mapSupabaseError(error),
     }
   }

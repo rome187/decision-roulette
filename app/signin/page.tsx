@@ -17,10 +17,10 @@ function SignInForm() {
 
   useEffect(() => {
     if (state.success) {
-      router.push(next)
-      router.refresh()
+      // Use window.location for a full page reload to ensure session is recognized
+      window.location.href = next
     }
-  }, [state.success, next, router])
+  }, [state.success, next])
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">

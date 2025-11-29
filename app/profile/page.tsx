@@ -1,5 +1,6 @@
 import { createServerComponentClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { ProfileForm } from './ProfileForm'
 import HamburgerMenu from '../components/HamburgerMenu'
 import { db, isDatabaseAvailable } from '@/lib/db'
@@ -78,6 +79,36 @@ export default async function ProfilePage() {
               </div>
             )}
           </dl>
+        </div>
+
+        {/* Continue Button */}
+        <div className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-8 shadow-md">
+          <div className="text-center space-y-4">
+            <h2 className="text-2xl font-bold text-white">
+              Ready to Make Decisions?
+            </h2>
+            <p className="text-blue-100">
+              Use the Decision Roulette to randomly select from your options
+            </p>
+            <Link
+              href="/decide"
+              className="inline-flex items-center justify-center rounded-md border border-transparent bg-white px-8 py-3 text-base font-medium text-blue-600 shadow-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 transition-all hover:scale-105"
+            >
+              Continue to Decision Roulette
+              <svg
+                className="ml-2 -mr-1 h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </Link>
+          </div>
         </div>
 
         {/* Profile Edit Form */}

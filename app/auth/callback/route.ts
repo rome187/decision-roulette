@@ -5,7 +5,7 @@ import { type NextRequest } from 'next/server'
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const next = requestUrl.searchParams.get('next') ?? '/'
+  const next = requestUrl.searchParams.get('next') ?? '/profile'
 
   // Create a response object for redirect
   let redirectResponse = NextResponse.redirect(new URL(next, requestUrl.origin))
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
             cookiesToSet.forEach(({ name, value }) => {
               request.cookies.set(name, value)
             })
-            // Create new response with updated cookies
+            // Recreate redirect response to ensure cookies are properly handled
             redirectResponse = NextResponse.redirect(new URL(next, requestUrl.origin))
             // Set cookies on the response
             cookiesToSet.forEach(({ name, value, options }) => {
@@ -44,6 +44,17 @@ export async function GET(request: NextRequest) {
       // Redirect to signin with error message
       const errorUrl = new URL('/signin', requestUrl.origin)
       errorUrl.searchParams.set('error', 'Failed to confirm email. Please try again.')
+      return NextResponse.redirect(errorUrl)
+    }
+
+    // Verify session was successfully created
+    const { data: { user }, error: getUserError } = await supabase.auth.getUser()
+    
+    if (getUserError || !user) {
+      console.error('Error verifying session after email confirmation:', getUserError)
+      // Redirect to signin with error message
+      const errorUrl = new URL('/signin', requestUrl.origin)
+      errorUrl.searchParams.set('error', 'Failed to establish session. Please try signing in.')
       return NextResponse.redirect(errorUrl)
     }
   }
