@@ -183,7 +183,6 @@ export async function signIn(
   const supabase = await createServerComponentClient()
 
   const email = formData.get('email') as string
-  const password = formData.get('password') as string
 
   const fieldErrors: AuthResult['fieldErrors'] = {}
 
@@ -191,12 +190,6 @@ export async function signIn(
   const emailError = validateEmail(email)
   if (emailError) {
     fieldErrors.email = emailError
-  }
-
-  // Validate password
-  const passwordError = validatePassword(password, false)
-  if (passwordError) {
-    fieldErrors.password = passwordError
   }
 
   // Return early if there are validation errors
@@ -207,9 +200,11 @@ export async function signIn(
     }
   }
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { error } = await supabase.auth.signInWithOtp({
     email: email.trim(),
-    password: password,
+    options: {
+      shouldCreateUser: false, // Only existing users can sign in
+    },
   })
 
   if (error) {
@@ -219,9 +214,10 @@ export async function signIn(
     }
   }
 
-  revalidatePath('/', 'layout')
   return {
     success: true,
+    codeSent: true,
+    email: email.trim(),
   }
 }
 
